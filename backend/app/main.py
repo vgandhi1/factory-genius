@@ -7,15 +7,16 @@ from contextlib import asynccontextmanager
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 
+from .audio_analysis import analyze_audio_bytes, anomaly_payload_from_audio
 from .config import settings
 from .mqtt_worker import start_mqtt_thread
 from .rag_engine import ManualRAG
-from .schemas import AnomalyPayload, DiagnosticEvent
+from .schemas import AnomalyPayload, AudioAnalysisResult, DiagnosticEvent
 from .store import EventStore
 
 logging.basicConfig(level=logging.INFO)
@@ -66,19 +67,7 @@ app.add_middleware(
 )
 
 
-@app.get("/api/health")
-def health() -> dict[str, Any]:
-    return {"status": "ok", "rag_chunks": rag.chunk_count}
-
-
-@app.get("/api/events")
-def list_events() -> list[dict[str, Any]]:
-    return [e.model_dump(mode="json") for e in event_store.list()]
-
-
-@app.post("/api/demo/ingest")
-async def demo_ingest(payload: AnomalyPayload) -> JSONResponse:
-    """HTTP fallback to simulate MQTT when broker is unavailable (dev only)."""
+async def _ingest_diagnostic_event(payload: AnomalyPayload) -> DiagnosticEvent:
     from datetime import datetime, timezone
     import uuid
 
@@ -102,6 +91,71 @@ async def demo_ingest(payload: AnomalyPayload) -> JSONResponse:
     )
     event_store.add(event)
     await event_queue.put(event)
+    return event
+
+
+@app.get("/api/health")
+def health() -> dict[str, Any]:
+    return {"status": "ok", "rag_chunks": rag.chunk_count}
+
+
+@app.get("/api/events")
+def list_events() -> list[dict[str, Any]]:
+    return [e.model_dump(mode="json") for e in event_store.list()]
+
+
+@app.post("/api/demo/ingest")
+async def demo_ingest(payload: AnomalyPayload) -> JSONResponse:
+    """HTTP fallback to simulate MQTT when broker is unavailable (dev only)."""
+    event = await _ingest_diagnostic_event(payload)
+    return JSONResponse(event.model_dump(mode="json"))
+
+
+@app.post("/api/audio/analyze", response_model=AudioAnalysisResult)
+async def audio_analyze(
+    audio: UploadFile = File(..., description="WAV/FLAC machinery recording"),
+) -> AudioAnalysisResult:
+    """STFT band-energy heuristic over uploaded audio (no RAG)."""
+    data = await audio.read()
+    try:
+        return await asyncio.to_thread(analyze_audio_bytes, data, settings.max_audio_upload_bytes)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception:
+        logger.exception("Audio analysis failed")
+        raise HTTPException(status_code=400, detail="Audio analysis failed.") from None
+
+
+@app.post("/api/audio/diagnose")
+async def audio_diagnose(
+    machine_id: str = Form(...),
+    audio: UploadFile = File(..., description="WAV/FLAC machinery recording"),
+    asset_class: str | None = Form(None),
+    thermal_c: float | None = Form(None),
+    thermal_baseline_c: float | None = Form(None),
+    rgb_summary: str | None = Form(None),
+) -> JSONResponse:
+    """Analyze uploaded machinery audio, run BM25 (+ optional LLM), store diagnostic event."""
+    data = await audio.read()
+    try:
+        analysis = await asyncio.to_thread(analyze_audio_bytes, data, settings.max_audio_upload_bytes)
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e)) from e
+    except Exception:
+        logger.exception("Audio analysis failed")
+        raise HTTPException(status_code=400, detail="Audio analysis failed.") from None
+
+    ac = asset_class.strip() if asset_class and asset_class.strip() else None
+    rs = rgb_summary.strip() if rgb_summary and rgb_summary.strip() else None
+    payload = anomaly_payload_from_audio(
+        machine_id,
+        analysis,
+        asset_class=ac,
+        thermal_c=thermal_c,
+        thermal_baseline_c=thermal_baseline_c,
+        rgb_summary=rs,
+    )
+    event = await _ingest_diagnostic_event(payload)
     return JSONResponse(event.model_dump(mode="json"))
 
 

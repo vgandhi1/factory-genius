@@ -14,12 +14,15 @@ type DiagnosticEvent = {
   payload: {
     machine_id: string
     timestamp_iso?: string | null
+    asset_class?: string | null
     thermal_c?: number | null
     thermal_baseline_c?: number | null
     acoustic_anomaly?: boolean
     acoustic_band_hz?: string | null
     rgb_summary?: string | null
     trigger_reason?: string | null
+    notes?: string | null
+    edge_hypothesis?: string | null
   }
   diagnosis_title: string
   diagnosis_body: string
@@ -58,6 +61,10 @@ export default function App() {
   const [health, setHealth] = useState<{ rag_chunks?: number } | null>(null)
   const [wsState, setWsState] = useState<'connecting' | 'open' | 'closed'>('closed')
   const [busy, setBusy] = useState(false)
+  const [audioMachineId, setAudioMachineId] = useState('conveyance-main-drive-1')
+  const [audioAssetClass, setAudioAssetClass] = useState('')
+  const [audioError, setAudioError] = useState<string | null>(null)
+  const [audioFile, setAudioFile] = useState<File | null>(null)
 
   const refresh = useCallback(async () => {
     const [h, ev] = await Promise.all([
@@ -113,6 +120,36 @@ export default function App() {
     }
   }
 
+  const postAudioDiagnose = async (file: File | null) => {
+    if (!file) return
+    setBusy(true)
+    setAudioError(null)
+    try {
+      const fd = new FormData()
+      fd.append('machine_id', audioMachineId)
+      fd.append('audio', file)
+      const ac = audioAssetClass.trim()
+      if (ac) fd.append('asset_class', ac)
+      const r = await fetch('/api/audio/diagnose', { method: 'POST', body: fd })
+      if (!r.ok) {
+        let msg = 'Audio diagnosis request failed'
+        try {
+          const j = (await r.json()) as { detail?: unknown }
+          if (typeof j.detail === 'string') msg = j.detail
+        } catch {
+          /* ignore */
+        }
+        setAudioError(msg)
+        return
+      }
+      const ev = (await r.json()) as DiagnosticEvent
+      setEvents((prev) => mergeById(prev, ev))
+      setAudioFile(null)
+    } finally {
+      setBusy(false)
+    }
+  }
+
   const statusDot = useMemo(() => {
     const color =
       wsState === 'open' ? 'bg-emerald-400' : wsState === 'connecting' ? 'bg-amber-400' : 'bg-red-400'
@@ -131,9 +168,9 @@ export default function App() {
               Conveyance &amp; rotary maintenance
             </h1>
             <p className="mt-1 max-w-xl text-sm text-zinc-400">
-              Shafts, idlers, and rotary modules—live MQTT feed, BM25 manual retrieval, and hints for{' '}
+              Multimodal maintenance copilot: live MQTT feed, machinery audio spectral hints, BM25 manual retrieval, and hints for{' '}
               <strong className="text-zinc-300">preventive</strong> vs <strong className="text-zinc-300">breakdown</strong>{' '}
-              response (optional LLM).
+              guidance (optional LLM). Upload WAV/FLAC for on-server STFT analysis—always validate on site.
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
@@ -185,13 +222,67 @@ export default function App() {
           </div>
         </section>
 
+        <section className="rounded-2xl border border-violet-500/20 bg-violet-950/[0.12] p-6 shadow-xl shadow-black/40 backdrop-blur">
+          <h2 className="font-display text-lg font-semibold text-white">Diagnose from machinery audio</h2>
+          <p className="mt-1 text-sm text-zinc-400">
+            <code className="rounded bg-black/40 px-1.5 py-0.5 text-violet-200/90">POST /api/audio/diagnose</code> — upload a short
+            WAV/FLAC clip; the server runs STFT band-energy analysis, then BM25 (+ optional LLM). Heuristic only—confirm with vibration,
+            thermal, and site procedures.
+          </p>
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <label className="block text-xs font-medium uppercase tracking-wide text-zinc-500">
+              Machine ID
+              <input
+                type="text"
+                value={audioMachineId}
+                onChange={(e) => setAudioMachineId(e.target.value)}
+                disabled={busy}
+                className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-violet-500/40 focus:ring-2"
+              />
+            </label>
+            <label className="block text-xs font-medium uppercase tracking-wide text-zinc-500">
+              Asset class (optional)
+              <input
+                type="text"
+                value={audioAssetClass}
+                onChange={(e) => setAudioAssetClass(e.target.value)}
+                placeholder="e.g. conveyor, cnc, stamping_press"
+                disabled={busy}
+                className="mt-1 w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none ring-violet-500/40 focus:ring-2"
+              />
+            </label>
+          </div>
+          <input
+            type="file"
+            accept=".wav,.flac,.ogg,audio/wav,audio/flac,audio/ogg"
+            disabled={busy}
+            onChange={(e) => setAudioFile(e.target.files?.[0] ?? null)}
+            className="mt-4 block w-full text-sm text-zinc-300 file:mr-4 file:rounded-lg file:border-0 file:bg-violet-500/25 file:px-4 file:py-2 file:text-sm file:font-medium file:text-violet-100 hover:file:bg-violet-500/35 disabled:opacity-50"
+          />
+          {audioFile && (
+            <p className="mt-2 text-xs text-zinc-500">
+              Selected: <span className="font-mono text-zinc-400">{audioFile.name}</span> (
+              {(audioFile.size / 1024).toFixed(1)} KB)
+            </p>
+          )}
+          {audioError && <p className="mt-2 text-sm text-red-300">{audioError}</p>}
+          <button
+            type="button"
+            disabled={busy || !audioFile}
+            onClick={() => void postAudioDiagnose(audioFile)}
+            className="mt-4 rounded-xl bg-gradient-to-r from-violet-500 to-fuchsia-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-violet-900/30 disabled:opacity-50"
+          >
+            Run audio → RAG diagnosis
+          </button>
+        </section>
+
         <section>
           <h2 className="font-display mb-4 text-lg font-semibold text-white">
             Diagnostic feed
           </h2>
           {events.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-white/15 bg-white/[0.02] px-6 py-16 text-center text-zinc-500">
-              No events yet. Start the API, then inject a demo or publish over MQTT.
+              No events yet. Start the API, then inject a demo, upload machinery audio, or publish over MQTT.
             </div>
           ) : (
             <ul className="space-y-6">
@@ -229,6 +320,15 @@ export default function App() {
                       <h4 className="text-xs font-semibold uppercase tracking-wide text-zinc-500">Evidence</h4>
                       {ev.payload.rgb_summary && (
                         <p className="text-sm leading-relaxed text-zinc-300">{ev.payload.rgb_summary}</p>
+                      )}
+                      {ev.payload.edge_hypothesis && (
+                        <p className="text-sm leading-relaxed text-violet-200/90">
+                          <span className="font-semibold text-violet-300/90">Audio / edge hypothesis:</span>{' '}
+                          {ev.payload.edge_hypothesis}
+                        </p>
+                      )}
+                      {ev.payload.notes && (
+                        <p className="text-xs leading-relaxed text-zinc-500">Signal notes: {ev.payload.notes}</p>
                       )}
                       <div className="rounded-xl border border-white/10 bg-black/30 p-4 text-xs text-zinc-400">
                         <p className="font-mono text-[11px] leading-relaxed break-all">
