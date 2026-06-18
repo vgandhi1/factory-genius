@@ -346,7 +346,7 @@ Aligned with [`docs/product/plan.md`](docs/product/plan.md) and [`docs/architect
 
 ## License
 
-Specify your organization’s license here if applicable.
+MIT — see [LICENSE](LICENSE).
 
 ---
 

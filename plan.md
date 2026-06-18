@@ -2,7 +2,7 @@
 
 **Status:** Active development — reference prototype, T1 compliance in progress  
 **Last updated:** 2026-06-17  
-**Tier:** T1 Dev (target T2 when LICENSE + presentation added)
+**Tier:** T1 Dev → T2 Release-ready (LICENSE added; presentation.html pending)
 
 ---
 
@@ -76,9 +76,9 @@ See [`docs/architecture/overview.md`](docs/architecture/overview.md) for target 
 - [x] LLM prompt injection guardrails (`<data>` blocks)
 - [x] Unit tests for core logic
 
-### M3 — Release-ready ⏳
+### M3 — Release-ready 🔄
 
-- [ ] `LICENSE` (MIT or Apache-2.0)
+- [x] `LICENSE` (MIT)
 - [ ] `presentation.html` + GitHub Pages
 - [ ] Retrieval golden eval set (nDCG / hit-rate)
 - [ ] Gate `/api/demo/ingest` on `ENVIRONMENT=development`
@@ -113,6 +113,7 @@ See [`docs/architecture/overview.md`](docs/architecture/overview.md) for target 
 
 | Date | Change |
 |------|--------|
+| 2026-06-17 | Add MIT LICENSE; sync README and plan tier |
 | 2026-06-17 | T1 cleanup: audio feature, CI, root plan, mosquitto restore, LLM `<data>` delimiters |
 | 2026-06-17 | Comprehensive review — [`docs/COMPREHENSIVE-REPORT.md`](docs/COMPREHENSIVE-REPORT.md) |
 | Initial | Reference prototype — BM25 RAG + MQTT + dashboard |
