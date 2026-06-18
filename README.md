@@ -4,7 +4,7 @@
 
 ### Generative-AI maintenance copilot for auto-plant critical assets
 
-**GitHub:** [`vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius) · **Local path (workspace):** `factory-system-AI/factory-genius/`
+**GitHub:** [`vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius) · **Demo deck:** [`presentation.html`](presentation.html)
 
 **Industry reference stack:** simulated **multimodal edge payloads** (thermal + optical summary + acoustic cues; optional **artifact refs** for thermal/RGB/spectrogram) → **MQTT** → **BM25 RAG** + optional **LLM text reasoning** → **technician dashboard** (preventive vs. breakdown guidance with cited manual excerpts). **Target brain:** centralized **VLM + audio/spectrogram** models on fused evidence + RAG (see [`docs/architecture/overview.md`](docs/architecture/overview.md)).
 
@@ -32,7 +32,7 @@
 
 <br />
 
-*Product & architecture:* [`plan.md`](plan.md) · [`docs/architecture/overview.md`](docs/architecture/overview.md) · [`docs/COMPREHENSIVE-REPORT.md`](docs/COMPREHENSIVE-REPORT.md)
+*Product & architecture:* [`plan.md`](plan.md) · [`docs/architecture/overview.md`](docs/architecture/overview.md) · [`docs/COMPREHENSIVE-REPORT.md`](docs/COMPREHENSIVE-REPORT.md) · [`presentation.html`](presentation.html)
 
 </div>
 
@@ -40,7 +40,7 @@
 
 > **Safety notice:** This is **not** production safety software. Validate every maintenance action with your plant procedures, OEM manuals, and qualified personnel.
 
-> **Naming (not a duplicate repo):** Product name **Factory Genius** · GitHub repo **[`factory-genius`](https://github.com/vgandhi1/factory-genius)** · this directory *is* that repo. It lives under `factory-system-AI/` for workspace grouping only, separate from the Digital Twin / FactoryOps / VisionGuard portfolio. Push local commits to sync GitHub if the remote README looks stale.
+> **Demo visualization:** open [`presentation.html`](presentation.html) in any browser for an 11-slide visual walkthrough — problem → architecture → multimodal evidence → preventive-vs-breakdown → API → roadmap. Self-contained (no build step, no CDN, works offline).
 
 ---
 
