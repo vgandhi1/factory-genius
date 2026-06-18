@@ -114,7 +114,7 @@ def _template_diagnosis(payload: AnomalyPayload, retrieved: list[RetrievedChunk]
         )
     if payload.acoustic_anomaly:
         lines.append(
-            f"**Acoustic:** anomaly flagged"
+            "**Acoustic:** anomaly flagged"
             + (f" in band {payload.acoustic_band_hz}" if payload.acoustic_band_hz else "")
         )
     if payload.rgb_summary:

@@ -14,6 +14,7 @@ from fastapi.staticfiles import StaticFiles
 
 from .audio_analysis import analyze_audio_bytes, anomaly_payload_from_audio
 from .config import settings
+from .events import build_event
 from .mqtt_worker import start_mqtt_thread
 from .rag_engine import ManualRAG
 from .schemas import AnomalyPayload, AudioAnalysisResult, DiagnosticEvent
@@ -68,27 +69,8 @@ app.add_middleware(
 
 
 async def _ingest_diagnostic_event(payload: AnomalyPayload) -> DiagnosticEvent:
-    from datetime import datetime, timezone
-    import uuid
-
-    from .diagnosis import retrieve_chunks, synthesize_diagnosis
-
-    retrieved = retrieve_chunks(rag, payload, top_k=5)
-    title, diag_body = synthesize_diagnosis(payload, retrieved)
-    event = DiagnosticEvent(
-        id=str(uuid.uuid4()),
-        received_at=datetime.now(timezone.utc),
-        payload=payload,
-        diagnosis_title=title,
-        diagnosis_body=diag_body,
-        retrieved=retrieved,
-        work_order_stub={
-            "asset": payload.machine_id,
-            "priority": "P1" if (payload.thermal_c or 0) > 80 else "P2",
-            "title": f"Inspect {payload.machine_id}: {payload.trigger_reason or 'anomaly'}",
-            "eam_status": "not_integrated",
-        },
-    )
+    # build_event may call an external LLM; keep it off the event loop.
+    event = await asyncio.to_thread(build_event, rag, payload)
     event_store.add(event)
     await event_queue.put(event)
     return event
@@ -111,11 +93,19 @@ async def demo_ingest(payload: AnomalyPayload) -> JSONResponse:
     return JSONResponse(event.model_dump(mode="json"))
 
 
+def _guard_upload_size(audio: UploadFile) -> None:
+    """Reject oversized uploads before buffering the whole body into memory/disk."""
+    size = audio.size
+    if size is not None and size > settings.max_audio_upload_bytes:
+        raise HTTPException(status_code=413, detail="Audio file exceeds the configured size limit.")
+
+
 @app.post("/api/audio/analyze", response_model=AudioAnalysisResult)
 async def audio_analyze(
     audio: UploadFile = File(..., description="WAV/FLAC machinery recording"),
 ) -> AudioAnalysisResult:
     """STFT band-energy heuristic over uploaded audio (no RAG)."""
+    _guard_upload_size(audio)
     data = await audio.read()
     try:
         return await asyncio.to_thread(analyze_audio_bytes, data, settings.max_audio_upload_bytes)
@@ -136,6 +126,7 @@ async def audio_diagnose(
     rgb_summary: str | None = Form(None),
 ) -> JSONResponse:
     """Analyze uploaded machinery audio, run BM25 (+ optional LLM), store diagnostic event."""
+    _guard_upload_size(audio)
     data = await audio.read()
     try:
         analysis = await asyncio.to_thread(analyze_audio_bytes, data, settings.max_audio_upload_bytes)

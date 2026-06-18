@@ -4,6 +4,8 @@
 
 ### Generative-AI maintenance copilot for auto-plant critical assets
 
+**GitHub:** [`vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius) · **Local path (workspace):** `factory-system-AI/factory-genius/`
+
 **Industry reference stack:** simulated **multimodal edge payloads** (thermal + optical summary + acoustic cues; optional **artifact refs** for thermal/RGB/spectrogram) → **MQTT** → **BM25 RAG** + optional **LLM text reasoning** → **technician dashboard** (preventive vs. breakdown guidance with cited manual excerpts). **Target brain:** centralized **VLM + audio/spectrogram** models on fused evidence + RAG (see [`docs/architecture/overview.md`](docs/architecture/overview.md)).
 
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-2563eb?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
@@ -15,6 +17,9 @@
 <br />
 
 <img src="https://img.shields.io/badge/status-reference_prototype-amber?style=flat-square" alt="reference prototype" />
+<img src="https://img.shields.io/badge/tier-T1_dev-blue?style=flat-square" alt="T1 dev" />
+<img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="MIT" />
+<img src="https://img.shields.io/badge/CI-pytest+ruff-emerald?style=flat-square" alt="CI" />
 <img src="https://img.shields.io/badge/EAM-not_integrated-slate?style=flat-square" alt="eam not integrated" />
 
 <br />
@@ -27,13 +32,15 @@
 
 <br />
 
-*Product & architecture:* [`docs/product/plan.md`](docs/product/plan.md) · [`docs/architecture/overview.md`](docs/architecture/overview.md)
+*Product & architecture:* [`plan.md`](plan.md) · [`docs/architecture/overview.md`](docs/architecture/overview.md) · [`docs/COMPREHENSIVE-REPORT.md`](docs/COMPREHENSIVE-REPORT.md)
 
 </div>
 
 ---
 
 > **Safety notice:** This is **not** production safety software. Validate every maintenance action with your plant procedures, OEM manuals, and qualified personnel.
+
+> **Naming (not a duplicate repo):** Product name **Factory Genius** · GitHub repo **[`factory-genius`](https://github.com/vgandhi1/factory-genius)** · this directory *is* that repo. It lives under `factory-system-AI/` for workspace grouping only, separate from the Digital Twin / FactoryOps / VisionGuard portfolio. Push local commits to sync GitHub if the remote README looks stale.
 
 ---
 
@@ -124,7 +131,7 @@ The **roadmap** below aligns with turning this prototype into a governed **MLOps
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/) if needed, then from the repo root:
 
 ```bash
-cd Factory-genius
+cd factory-genius
 uv venv                    # creates .venv (Python 3.11+)
 source .venv/bin/activate  # Windows: .venv\Scripts\activate
 uv pip install -r requirements.txt
@@ -134,7 +141,7 @@ uv pip install -r requirements.txt
 <summary>Alternative: <code>python -m venv</code> + <code>pip</code></summary>
 
 ```bash
-cd Factory-genius
+cd factory-genius
 python3 -m venv .venv
 source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
@@ -236,7 +243,7 @@ Settings are defined in `backend/app/config.py` ([Pydantic Settings](https://doc
 
 **1. Create `.env` in the repo root**
 
-From `Factory-genius/`, copy the template and edit values (especially `OPENAI_API_KEY` if you want LLM diagnosis):
+From `factory-genius/`, copy the template and edit values (especially `OPENAI_API_KEY` if you want LLM diagnosis):
 
 ```bash
 cat > .env << 'EOF'
@@ -334,7 +341,7 @@ Add or edit Markdown under `data/knowledge/`. Chunks are derived per file (split
 
 ## Roadmap
 
-Aligned with [`docs/product/plan.md`](docs/product/plan.md) and [`docs/architecture/overview.md`](docs/architecture/overview.md):
+Aligned with [`plan.md`](plan.md) and [`docs/architecture/overview.md`](docs/architecture/overview.md):
 
 - On-device fusion on **Jetson**: FLIR-class thermal plus RGB plus **directional-mic spectrograms**; privacy band-pass and real firmware  
 - **Central brain:** industrially tuned **VLM + audio or spectrogram** model on fused packets; orchestration with RAG  

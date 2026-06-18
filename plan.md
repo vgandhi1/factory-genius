@@ -79,7 +79,7 @@ See [`docs/architecture/overview.md`](docs/architecture/overview.md) for target 
 ### M3 — Release-ready 🔄
 
 - [x] `LICENSE` (MIT)
-- [ ] `presentation.html` + GitHub Pages
+- [x] `presentation.html` (self-contained deck; GitHub Pages deploy pending)
 - [ ] Retrieval golden eval set (nDCG / hit-rate)
 - [ ] Gate `/api/demo/ingest` on `ENVIRONMENT=development`
 

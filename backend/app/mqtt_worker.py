@@ -4,14 +4,12 @@ import asyncio
 import json
 import logging
 import threading
-import uuid
-from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Callable
 
 import paho.mqtt.client as mqtt
 
 from .config import settings
-from .diagnosis import retrieve_chunks, synthesize_diagnosis
+from .events import build_event
 from .rag_engine import ManualRAG
 from .schemas import AnomalyPayload, DiagnosticEvent
 
@@ -36,36 +34,27 @@ def make_on_message(
     loop: asyncio.AbstractEventLoop,
     event_queue: asyncio.Queue[DiagnosticEvent],
 ) -> Callable[[mqtt.Client, object, mqtt.MQTTMessage], None]:
+    async def _process(payload: AnomalyPayload) -> None:
+        # Diagnosis (incl. optional LLM) runs in a worker thread so it never blocks
+        # the MQTT network loop nor the asyncio event loop.
+        event = await asyncio.to_thread(build_event, rag, payload)
+        store.add(event)
+        await event_queue.put(event)
+
     def on_message(_client: mqtt.Client, _userdata: object, message: mqtt.MQTTMessage) -> None:
         payload = _parse_payload(message.payload)
         if payload is None:
             return
+        # Hand off to the event loop immediately; do not block loop_forever().
+        future = asyncio.run_coroutine_threadsafe(_process(payload), loop)
 
-        retrieved = retrieve_chunks(rag, payload, top_k=5)
-        title, body = synthesize_diagnosis(payload, retrieved)
-        event = DiagnosticEvent(
-            id=str(uuid.uuid4()),
-            received_at=datetime.now(timezone.utc),
-            payload=payload,
-            diagnosis_title=title,
-            diagnosis_body=body,
-            retrieved=retrieved,
-            work_order_stub={
-                "asset": payload.machine_id,
-                "priority": "P1" if (payload.thermal_c or 0) > 80 else "P2",
-                "title": f"Inspect {payload.machine_id}: {payload.trigger_reason or 'anomaly'}",
-                "eam_status": "not_integrated",
-            },
-        )
-        store.add(event)
-
-        def _enqueue() -> None:
+        def _log_error(fut: object) -> None:
             try:
-                event_queue.put_nowait(event)
+                future.result()
             except Exception:
-                logger.exception("Failed to enqueue diagnostic event")
+                logger.exception("Failed to process diagnostic event")
 
-        loop.call_soon_threadsafe(_enqueue)
+        future.add_done_callback(_log_error)
 
     return on_message
 
