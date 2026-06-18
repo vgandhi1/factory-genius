@@ -4,10 +4,11 @@
 
 ### Generative-AI maintenance copilot for auto-plant critical assets
 
-**GitHub:** [`vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius) · **Demo deck:** [`presentation.html`](presentation.html)
+**GitHub:** [`vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius) · **Demo deck:** [`presentation.html`](presentation.html) · **🖥️ Live:** **[vgandhi1.github.io/factory-genius](https://vgandhi1.github.io/factory-genius)**
 
 **Industry reference stack:** simulated **multimodal edge payloads** (thermal + optical summary + acoustic cues; optional **artifact refs** for thermal/RGB/spectrogram) → **MQTT** → **BM25 RAG** + optional **LLM text reasoning** → **technician dashboard** (preventive vs. breakdown guidance with cited manual excerpts). **Target brain:** centralized **VLM + audio/spectrogram** models on fused evidence + RAG (see [`docs/architecture/overview.md`](docs/architecture/overview.md)).
 
+[![Live demo deck](https://img.shields.io/badge/live_demo-GitHub_Pages-2563eb?style=for-the-badge&logo=github&logoColor=white)](https://vgandhi1.github.io/factory-genius)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11+-2563eb?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
 [![React](https://img.shields.io/badge/React-20232a?style=for-the-badge&logo=react&logoColor=61dafb)](https://react.dev/)
@@ -32,7 +33,7 @@
 
 <br />
 
-*Product & architecture:* [`plan.md`](plan.md) · [`docs/architecture/overview.md`](docs/architecture/overview.md) · [`docs/COMPREHENSIVE-REPORT.md`](docs/COMPREHENSIVE-REPORT.md) · [`presentation.html`](presentation.html)
+*Product & architecture:* [`plan.md`](plan.md) · [`docs/architecture/overview.md`](docs/architecture/overview.md) · [`docs/COMPREHENSIVE-REPORT.md`](docs/COMPREHENSIVE-REPORT.md) · [`presentation.html`](presentation.html) ([live](https://vgandhi1.github.io/factory-genius))
 
 </div>
 
@@ -40,7 +41,7 @@
 
 > **Safety notice:** This is **not** production safety software. Validate every maintenance action with your plant procedures, OEM manuals, and qualified personnel.
 
-> **Demo visualization:** open [`presentation.html`](presentation.html) in any browser for an 11-slide visual walkthrough — problem → architecture → multimodal evidence → preventive-vs-breakdown → API → roadmap. Self-contained (no build step, no CDN, works offline).
+> **Demo visualization:** view the deck live at **[vgandhi1.github.io/factory-genius](https://vgandhi1.github.io/factory-genius)**, or open [`presentation.html`](presentation.html) in any browser — an 11-slide visual walkthrough — problem → architecture → multimodal evidence → preventive-vs-breakdown → API → roadmap. Self-contained (no build step, no CDN, works offline).
 
 ---
 
