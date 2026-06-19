@@ -1,9 +1,9 @@
 # Factory Genius — Comprehensive Review Report
 
 **Review date:** 2026-06-17 (initial) · **Last updated:** 2026-06-17 (post T1 cleanup)  
-**Repository:** `factory-system-AI/factory-genius/` · **Remote (canonical):** [`github.com/vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius)  
+**Repository:** `factory-genius/` (top-level repo, sibling of `factory-system-AI/`) · **Remote (canonical):** [`github.com/vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius)  
 **Branch:** `main` · **HEAD:** `0ce7e65` — *chore(license): add MIT LICENSE for public release readiness*  
-**Reviewed against:** [`governance/standards/COMPLIANCE.md`](../../../governance/standards/COMPLIANCE.md), [`08-AI-SECURITY.md`](../../../governance/standards/08-AI-SECURITY.md), [`factory-ai-portfolio-guardrails.md`](../../../governance/Guardrails/specialized/factory-portfolio/factory-ai-portfolio-guardrails.md)
+**Reviewed against:** [`governance/standards/COMPLIANCE.md`](../../governance/standards/COMPLIANCE.md), [`08-AI-SECURITY.md`](../../governance/standards/08-AI-SECURITY.md), [`factory-ai-portfolio-guardrails.md`](../../governance/Guardrails/specialized/factory-portfolio/factory-ai-portfolio-guardrails.md)
 
 ---
 
@@ -13,7 +13,7 @@
 |-------|-------|
 | **Product name** | Factory Genius |
 | **GitHub repo** | [`vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius) |
-| **Local folder** | `factory-system-AI/factory-genius/` (matches repo name) |
+| **Local folder** | `factory-genius/` (top-level sibling of `factory-system-AI/`; matches repo name) |
 | **Portfolio membership** | **None** — separate reliability vertical |
 
 There is **no second project** with this name. The perceived conflict is usually (1) folder was previously `Factory-genius` (capital F) vs GitHub `factory-genius`, or (2) GitHub shows the **initial commit** while local has **3+ unpushed commits**. **Fix:** `git push origin main`.
@@ -22,7 +22,7 @@ There is **no second project** with this name. The perceived conflict is usually
 
 ## Executive summary
 
-**Factory Genius** is a **standalone reference prototype** for a generative-AI **maintenance copilot** (conveyors, stamping presses, CNC). It sits **outside** the three-repo Factory AI portfolio documented in [`factory-system-AI/portfolio/`](../portfolio/).
+**Factory Genius** is a **standalone reference prototype** for a generative-AI **maintenance copilot** (conveyors, stamping presses, CNC). It sits **outside** the three-repo Factory AI portfolio documented in [`factory-system-AI/portfolio/`](../../factory-system-AI/portfolio/).
 
 | Dimension | Assessment (updated) |
 |-----------|----------------------|
@@ -55,7 +55,7 @@ There is **no second project** with this name. The perceived conflict is usually
 
 ### 1.2 Portfolio relationship
 
-Per [`factory-system-AI/README.md`](../README.md): **not** part of Digital Twin / FactoryOps / VisionGuard. Complements that story as a **reliability / maintenance** vertical.
+Per [`factory-system-AI/README.md`](../../factory-system-AI/README.md): **not** part of Digital Twin / FactoryOps / VisionGuard. Complements that story as a **reliability / maintenance** vertical.
 
 ---
 

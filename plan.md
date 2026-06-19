@@ -104,7 +104,7 @@ See [`docs/architecture/overview.md`](docs/architecture/overview.md) for target 
 
 ## Open questions
 
-- Publish as standalone public repo only, or link from `factory-system-AI` container README?
+- ~~Publish as standalone public repo only, or link from `factory-system-AI` container README?~~ **Resolved:** standalone repo (`vgandhi1/factory-genius`), now a top-level sibling folder (no longer nested under `factory-system-AI/`); `factory-system-AI/README.md` links it as a separate experiment.
 - Target Python 3.11 vs 3.12 in CI (currently 3.12)?
 
 ---
