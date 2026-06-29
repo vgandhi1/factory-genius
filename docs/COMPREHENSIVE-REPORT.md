@@ -3,7 +3,7 @@
 **Review date:** 2026-06-17 (initial) · **Last updated:** 2026-06-17 (post T1 cleanup)  
 **Repository:** `factory-genius/` (top-level repo, sibling of `factory-system-AI/`) · **Remote (canonical):** [`github.com/vgandhi1/factory-genius`](https://github.com/vgandhi1/factory-genius)  
 **Branch:** `main` · **HEAD:** `0ce7e65` — *chore(license): add MIT LICENSE for public release readiness*  
-**Reviewed against:** [`governance/standards/COMPLIANCE.md`](../../governance/standards/COMPLIANCE.md), [`08-AI-SECURITY.md`](../../governance/standards/08-AI-SECURITY.md), [`factory-ai-portfolio-guardrails.md`](../../governance/Guardrails/specialized/factory-portfolio/factory-ai-portfolio-guardrails.md)
+**Reviewed against:** [`governance/standards/COMPLIANCE.md`](https://github.com/vgandhi1/standards/blob/main/COMPLIANCE.md), [`08-AI-SECURITY.md`](https://github.com/vgandhi1/standards/blob/main/08-AI-SECURITY.md), `factory-ai-portfolio-guardrails.md`
 
 ---
 
@@ -22,7 +22,7 @@ There is **no second project** with this name. The perceived conflict is usually
 
 ## Executive summary
 
-**Factory Genius** is a **standalone reference prototype** for a generative-AI **maintenance copilot** (conveyors, stamping presses, CNC). It sits **outside** the three-repo Factory AI portfolio documented in [`factory-system-AI/portfolio/`](../../factory-system-AI/portfolio/).
+**Factory Genius** is a **standalone reference prototype** for a generative-AI **maintenance copilot** (conveyors, stamping presses, CNC). It sits **outside** the three-repo Factory AI portfolio documented in [`factory-system-AI/portfolio/`](https://github.com/vgandhi1/factory-system-AI/tree/main/portfolio/).
 
 | Dimension | Assessment (updated) |
 |-----------|----------------------|
@@ -55,7 +55,7 @@ There is **no second project** with this name. The perceived conflict is usually
 
 ### 1.2 Portfolio relationship
 
-Per [`factory-system-AI/README.md`](../../factory-system-AI/README.md): **not** part of Digital Twin / FactoryOps / VisionGuard. Complements that story as a **reliability / maintenance** vertical.
+Per [`factory-system-AI/README.md`](https://github.com/vgandhi1/factory-system-AI/blob/main/README.md): **not** part of Digital Twin / FactoryOps / VisionGuard. Complements that story as a **reliability / maintenance** vertical.
 
 ---
 
